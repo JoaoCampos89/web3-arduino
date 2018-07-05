@@ -10,6 +10,8 @@
 
 using namespace std;
 
+#define ENABLE_GANACHE true
+
 class Web3 {
 public:
     Web3(const string* _host, const string* _path);

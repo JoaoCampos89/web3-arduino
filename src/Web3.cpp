@@ -3,7 +3,13 @@
 //
 
 #include "Web3.h"
-#include <WiFiClientSecure.h>
+
+#if ENABLE_GANACHE
+  #include <WiFi.h>
+#else
+  #include <WiFiClientSecure.h>
+#endif
+
 #include "CaCert.h"
 #include "Log.h"
 #include "Util.h"
@@ -11,12 +17,19 @@
 #include <iostream>
 #include <sstream>
 
-WiFiClientSecure client;
+#if ENABLE_GANACHE
+  WiFiClient client;
+#else
+  WiFiClientSecure client;
+#endif
+
 Log debug;
 #define LOG(x) debug.println(x)
 
 Web3::Web3(const string* _host, const string* _path) {
-    client.setCACert(infura_ca_cert);
+    #if ENABLE_GANACHE == false
+      client.setCACert(infura_ca_cert);
+    #endif
     host = _host;
     path = _path;
 }
