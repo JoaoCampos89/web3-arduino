@@ -15,6 +15,7 @@ using namespace std;
 class Web3 {
 public:
     Web3(const string* _host, const string* _path);
+    Web3(const string* _host, const string* _path, const int hostPort);
     string Web3ClientVersion();
     string Web3Sha3(const string* data);
     int NetVersion();
@@ -46,6 +47,7 @@ private:
 private:
     const string* host;
     const string* path;
+    const int port = 0;
 
 
 };

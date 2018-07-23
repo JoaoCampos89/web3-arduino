@@ -3,19 +3,15 @@
 //
 
 #include "Web3.h"
-<<<<<<< HEAD
-=======
 
->>>>>>> 6fdfec64258338a535806c48cccde375cb58573f
+
+
 #if ENABLE_GANACHE
   #include <WiFi.h>
 #else
   #include <WiFiClientSecure.h>
 #endif
-<<<<<<< HEAD
-=======
 
->>>>>>> 6fdfec64258338a535806c48cccde375cb58573f
 #include "CaCert.h"
 #include "Log.h"
 #include "Util.h"
@@ -23,15 +19,6 @@
 #include <iostream>
 #include <sstream>
 
-#if ENABLE_GANACHE
-  WiFiClient client;
-#else
-  WiFiClientSecure client;
-#endif
-<<<<<<< HEAD
-=======
-
->>>>>>> 6fdfec64258338a535806c48cccde375cb58573f
 Log debug;
 #define LOG(x) debug.println(x)
 
@@ -42,6 +29,15 @@ Web3::Web3(const string* _host, const string* _path) {
     host = _host;
     path = _path;
 }
+Web3::Web3(const string* _host, const string* _path, const int _hostPort) {
+    #if ENABLE_GANACHE == false
+      client.setCACert(infura_ca_cert);
+    #endif
+    host = _host;
+    path = _path;
+    port = _hostPort;
+}
+
 
 string Web3::Web3ClientVersion() {
     string m = "web3_clientVersion";
@@ -199,15 +195,16 @@ string Web3::exec(const string* data) {
 
     LOG("Data to request");
     LOG(data->c_str());
+  
+    int connected = client.connect(host->c_str(), 8545);
 
-  	int connected = client.connect(host->c_str(), 8545);
+
 
     if (!connected) {
 		LOG("\nNot connected");
         return "";
 
     }
-
     LOG("Connected to server!");
     // Make a HTTP request:
     int l = data->size();
@@ -216,7 +213,6 @@ string Web3::exec(const string* data) {
     string lstr = ss.str();
 
     string strPost = "POST " + *path + " HTTP/1.1";
-	//string strPost = "POST / HTTP/1.1";
     string strHost = "Host: " + *host;
     string strContentLen = "Content-Length: " + lstr;
 
@@ -240,11 +236,6 @@ string Web3::exec(const string* data) {
      }
     }
 
-/*    while(client.available()) {
-       String line = client.readStringUntil('\r');
-       Serial.print(line);
-   }*/
-
     while (client.available()) {
         String line = client.readStringUntil('\n');
         LOG(line.c_str());
@@ -265,8 +256,6 @@ string Web3::exec(const string* data) {
     		}
 		    i++;
     }
-    LOG("Log JSON");
-    LOG(result.c_str());
 
     client.stop();
 
@@ -275,13 +264,9 @@ string Web3::exec(const string* data) {
 
 int Web3::getInt(const string* json) {
     int ret = -1;
-  	LOG("getINT");
-  //	LOG(json->c_str());
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
 	  string toPrint = cJSON_Print(root);
-	  LOG("PrintingJson");
-	   LOG(toPrint.c_str());
     value = cJSON_GetObjectItem(root, "result");
     if (cJSON_IsString(value)) {
         ret = strtol(value->valuestring, nullptr, 16);
@@ -292,8 +277,6 @@ int Web3::getInt(const string* json) {
 
 long Web3::getLong(const string* json) {
     long ret = -1;
-	LOG("getLong");
-	LOG(json->c_str());
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
     value = cJSON_GetObjectItem(root, "result");
