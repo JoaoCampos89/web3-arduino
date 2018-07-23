@@ -3,11 +3,19 @@
 //
 
 #include "Web3.h"
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6fdfec64258338a535806c48cccde375cb58573f
 #if ENABLE_GANACHE
   #include <WiFi.h>
 #else
   #include <WiFiClientSecure.h>
 #endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6fdfec64258338a535806c48cccde375cb58573f
 #include "CaCert.h"
 #include "Log.h"
 #include "Util.h"
@@ -20,6 +28,10 @@
 #else
   WiFiClientSecure client;
 #endif
+<<<<<<< HEAD
+=======
+
+>>>>>>> 6fdfec64258338a535806c48cccde375cb58573f
 Log debug;
 #define LOG(x) debug.println(x)
 
