@@ -2,12 +2,8 @@
 // Created by Okada, Takahiro on 2018/02/04.
 //
 
-#include "Web3.h"
-#if ENABLE_GANACHE
-  #include <WiFi.h>
-#else
-  #include <WiFiClientSecure.h>
-#endif
+#include "QWeb3.h"
+#include <WiFiClientSecure.h>
 #include "CaCert.h"
 #include "Log.h"
 #include "Util.h"
@@ -15,23 +11,17 @@
 #include <iostream>
 #include <sstream>
 
-#if ENABLE_GANACHE
-  WiFiClient client;
-#else
-  WiFiClientSecure client;
-#endif
+WiFiClientSecure client;
 Log debug;
 #define LOG(x) debug.println(x)
 
-Web3::Web3(const string* _host, const string* _path) {
-    #if ENABLE_GANACHE == false
-      client.setCACert(infura_ca_cert);
-    #endif
+QWeb3::QWeb3(const string* _host, const string* _path) {
+    client.setCACert(infura_ca_cert);
     host = _host;
     path = _path;
 }
 
-string Web3::Web3ClientVersion() {
+string QWeb3::Web3ClientVersion() {
     string m = "web3_clientVersion";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -39,7 +29,7 @@ string Web3::Web3ClientVersion() {
     return getString(&output);
 }
 
-string Web3::Web3Sha3(const string* data) {
+string QWeb3::Web3Sha3(const string* data) {
     string m = "web3_sha3";
     string p = "[\"" + *data + "\"]";
     string input = generateJson(&m, &p);
@@ -47,7 +37,7 @@ string Web3::Web3Sha3(const string* data) {
     return getString(&output);
 }
 
-int Web3::NetVersion() {
+int QWeb3::NetVersion() {
     string m = "net_version";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -55,7 +45,7 @@ int Web3::NetVersion() {
     return getInt(&output);
 }
 
-bool Web3::NetListening() {
+bool QWeb3::NetListening() {
     string m = "net_listening";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -63,7 +53,7 @@ bool Web3::NetListening() {
     return getBool(&output);
 }
 
-int Web3::NetPeerCount() {
+int QWeb3::NetPeerCount() {
     string m = "net_peerCount";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -71,7 +61,7 @@ int Web3::NetPeerCount() {
     return getInt(&output);
 }
 
-double Web3::EthProtocolVersion() {
+double QWeb3::EthProtocolVersion() {
     string m = "eth_protocolVersion";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -79,7 +69,7 @@ double Web3::EthProtocolVersion() {
     return getDouble(&output);
 }
 
-bool Web3::EthSyncing() {
+bool QWeb3::EthSyncing() {
     string m = "eth_syncing";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -98,7 +88,7 @@ bool Web3::EthSyncing() {
     return ret;
 }
 
-bool Web3::EthMining() {
+bool QWeb3::EthMining() {
     string m = "eth_mining";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -106,7 +96,7 @@ bool Web3::EthMining() {
     return getBool(&output);
 }
 
-double Web3::EthHashrate() {
+double QWeb3::EthHashrate() {
     string m = "eth_hashrate";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -114,7 +104,7 @@ double Web3::EthHashrate() {
     return getDouble(&output);
 }
 
-long long int Web3::EthGasPrice() {
+long long int QWeb3::EthGasPrice() {
     string m = "eth_gasPrice";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -122,11 +112,11 @@ long long int Web3::EthGasPrice() {
     return getLongLong(&output);
 }
 
-void Web3::EthAccounts(char** array, int size) {
+void QWeb3::EthAccounts(char** array, int size) {
      // TODO
 }
 
-int Web3::EthBlockNumber() {
+int QWeb3::EthBlockNumber() {
     string m = "eth_blockNumber";
     string p = "[]";
     string input = generateJson(&m, &p);
@@ -134,7 +124,7 @@ int Web3::EthBlockNumber() {
     return getInt(&output);
 }
 
-long long int Web3::EthGetBalance(const string* address) {
+long long int QWeb3::EthGetBalance(const string* address) {
     string m = "eth_getBalance";
     string p = "[\"" + *address + "\",\"latest\"]";
     string input = generateJson(&m, &p);
@@ -142,7 +132,7 @@ long long int Web3::EthGetBalance(const string* address) {
     return getLongLong(&output);
 }
 
-int Web3::EthGetTransactionCount(const string* address) {
+int QWeb3::EthGetTransactionCount(const string* address) {
     string m = "eth_getTransactionCount";
     string p = "[\"" + *address + "\",\"latest\"]";
     string input = generateJson(&m, &p);
@@ -150,7 +140,7 @@ int Web3::EthGetTransactionCount(const string* address) {
     return getInt(&output);
 }
 
-string Web3::EthCall(const string* from, const string* to, long gas, long gasPrice,
+string QWeb3::EthCall(const string* from, const string* to, long gas, long gasPrice,
                      const string* value, const string* data) {
     // TODO use gas, gasprice and value
     string m = "eth_call";
@@ -160,7 +150,7 @@ string Web3::EthCall(const string* from, const string* to, long gas, long gasPri
     return exec(&input);
 }
 
-string Web3::EthSendSignedTransaction(const string* data, const uint32_t dataLen) {
+string QWeb3::EthSendSignedTransaction(const string* data, const uint32_t dataLen) {
     string m = "eth_sendRawTransaction";
     string p = "[\"" + *data + "\"]";
     string input = generateJson(&m, &p);
@@ -173,27 +163,18 @@ string Web3::EthSendSignedTransaction(const string* data, const uint32_t dataLen
 // -------------------------------
 // Private
 
-string Web3::generateJson(const string* method, const string* params) {
+string QWeb3::generateJson(const string* method, const string* params) {
     return "{\"jsonrpc\":\"2.0\",\"method\":\"" + *method + "\",\"params\":" + *params + ",\"id\":0}";
 }
 
-string Web3::exec(const string* data) {
+string QWeb3::execPOST(const string* data) {
     string result;
 
     // start connection
     LOG("\nStarting connection to server...");
-    //int connected = client.connect(host->c_str(), 443);
-  	LOG(host->c_str());
-
-    LOG("Data to request");
-    LOG(data->c_str());
-
-  	int connected = client.connect(host->c_str(), 8545);
-
+    int connected = client.connect(host->c_str(), 443);
     if (!connected) {
-		LOG("\nNot connected");
         return "";
-
     }
 
     LOG("Connected to server!");
@@ -204,7 +185,6 @@ string Web3::exec(const string* data) {
     string lstr = ss.str();
 
     string strPost = "POST " + *path + " HTTP/1.1";
-	//string strPost = "POST / HTTP/1.1";
     string strHost = "Host: " + *host;
     string strContentLen = "Content-Length: " + lstr;
 
@@ -215,25 +195,8 @@ string Web3::exec(const string* data) {
     client.println("Connection: close");
     client.println();
     client.println(data->c_str());
- /**
-  * Need To add this to wait for server reply
-  * TODO Better handle errors
-  */
-    unsigned long timeout = millis();
-    while (client.available() == 0) {
-    if (millis() - timeout > 5000) {
-        Serial.println(">>> Client Timeout !");
-        client.stop();
-          break;
-     }
-    }
 
-/*    while(client.available()) {
-       String line = client.readStringUntil('\r');
-       Serial.print(line);
-   }*/
-
-    while (client.available()) {
+    while (client.connected()) {
         String line = client.readStringUntil('\n');
         LOG(line.c_str());
         if (line == "\r") {
@@ -242,18 +205,10 @@ string Web3::exec(const string* data) {
     }
     // if there are incoming bytes available
     // from the server, read them and print them:
-   	int i = 0;
     while (client.available()) {
         char c = client.read();
-        Serial.print(c);
-    		// adding if to only get json value
-    		// to be removed
-    		if(i>1){
-            result += c;
-    		}
-		    i++;
+        result += c;
     }
-    LOG("Log JSON");
     LOG(result.c_str());
 
     client.stop();
@@ -261,15 +216,62 @@ string Web3::exec(const string* data) {
     return result;
 }
 
-int Web3::getInt(const string* json) {
+string Web3::execGET(const string* getPATH) {
+    string result;
+
+    // start connection
+    LOG("\nStarting connection to server...");
+    int connected = client.connect(host->c_str(), 443);
+    if (!connected) {
+        return "";
+    }
+
+    LOG("Connected to server!");
+    // Make a HTTP request:
+    int l = data->size();
+    stringstream ss;
+    ss << l;
+    string lstr = ss.str();
+
+    string strPost = "GET " + *path + *getPATH + " HTTP/1.1";
+    string strHost = "Host: " + *host;
+  //  string strContentLen = "Content-Length: " + lstr;
+
+    client.println(strPost.c_str());
+    client.println(strHost.c_str());
+    client.println("Content-Type: application/json");
+    //client.println(strContentLen.c_str());
+    client.println("Connection: close");
+    client.println();
+    //client.println(data->c_str());
+
+    while (client.connected()) {
+        String line = client.readStringUntil('\n');
+        LOG(line.c_str());
+        if (line == "\r") {
+            break;
+        }
+    }
+    // if there are incoming bytes available
+    // from the server, read them and print them:
+    while (client.available()) {
+        char c = client.read();
+        result += c;
+    }
+    LOG(result.c_str());
+
+    client.stop();
+
+    return result;
+}
+
+
+
+
+int QWeb3::getInt(const string* json) {
     int ret = -1;
-  	LOG("getINT");
-  //	LOG(json->c_str());
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
-	  string toPrint = cJSON_Print(root);
-	  LOG("PrintingJson");
-	   LOG(toPrint.c_str());
     value = cJSON_GetObjectItem(root, "result");
     if (cJSON_IsString(value)) {
         ret = strtol(value->valuestring, nullptr, 16);
@@ -278,10 +280,8 @@ int Web3::getInt(const string* json) {
     return ret;
 }
 
-long Web3::getLong(const string* json) {
+long QWeb3::getLong(const string* json) {
     long ret = -1;
-	LOG("getLong");
-	LOG(json->c_str());
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
     value = cJSON_GetObjectItem(root, "result");
@@ -292,10 +292,8 @@ long Web3::getLong(const string* json) {
     return ret;
 }
 
-long long int Web3::getLongLong(const string* json) {
+long long int QWeb3::getLongLong(const string* json) {
     long long int ret = -1;
-	LOG("getLongLong");
-	LOG(json->c_str());
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
     value = cJSON_GetObjectItem(root, "result");
@@ -306,10 +304,8 @@ long long int Web3::getLongLong(const string* json) {
     return ret;
 }
 
-double Web3::getDouble(const string* json) {
+double QWeb3::getDouble(const string* json) {
     double ret = -1;
-	LOG("getDouble");
-	LOG(json->c_str());
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
     value = cJSON_GetObjectItem(root, "result");
@@ -321,7 +317,7 @@ double Web3::getDouble(const string* json) {
     return ret;
 }
 
-bool Web3::getBool(const string* json) {
+bool QWeb3::getBool(const string* json) {
     bool ret = false;
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
@@ -333,7 +329,7 @@ bool Web3::getBool(const string* json) {
     return ret;
 }
 
-string Web3::getString(const string* json) {
+string QWeb3::getString(const string* json) {
     cJSON *root, *value;
     root = cJSON_Parse(json->c_str());
     value = cJSON_GetObjectItem(root, "result");

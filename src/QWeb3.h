@@ -10,11 +10,9 @@
 
 using namespace std;
 
-#define ENABLE_GANACHE true
-
-class Web3 {
+class QWeb3 {
 public:
-    Web3(const string* _host, const string* _path);
+    QWeb3(const string* _host, const string* _path);
     string Web3ClientVersion();
     string Web3Sha3(const string* data);
     int NetVersion();
@@ -34,7 +32,9 @@ public:
     string EthSendSignedTransaction(const string* data, const uint32_t dataLen);
 
 private:
+    string execPOST(const string* data);
     string exec(const string* data);
+    string execGET(const string* getPATH);
     string generateJson(const string* method, const string* params);
     int getInt(const string* json);
     long getLong(const string* json);

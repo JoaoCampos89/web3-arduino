@@ -10,7 +10,7 @@
 
 // returns output (header) length
 uint32_t Util::RlpEncodeWholeHeader(uint8_t* header_output, uint32_t total_len) {
-    if (total_len < 55) {
+    if (total_len <= 55) {
         header_output[0] = (uint8_t)0xc0 + (uint8_t)total_len;
         return 1;
     } else {
@@ -41,7 +41,7 @@ uint32_t Util::RlpEncodeWholeHeader(uint8_t* header_output, uint32_t total_len) 
 
 vector<uint8_t> Util::RlpEncodeWholeHeaderWithVector(uint32_t total_len) {
     vector<uint8_t> header_output;
-    if (total_len < 55) {
+    if (total_len <= 55) {
         header_output.push_back((uint8_t)0xc0 + (uint8_t)total_len);
     } else {
         vector<uint8_t> tmp_header;
@@ -130,13 +130,13 @@ vector<uint8_t> Util::RlpEncodeItemWithVector(const vector<uint8_t> input) {
             tmp = (uint32_t)(tmp / 256);
         }
         tmp_header.push_back((uint8_t)(tmp));
-        uint8_t len = tmp_header.size() + 1;
-        tmp_header.insert(tmp_header.begin(), 0xb7 + len);
+        uint8_t hexdigit = tmp_header.size();
+        tmp_header.insert(tmp_header.begin(), 0xb7 + hexdigit);
 
         // fix direction for header
         vector<uint8_t> header;
         header.push_back(tmp_header[0]);
-        uint8_t hexdigit = tmp_header.size() - 1;
+
         for (int i=0; i<hexdigit; i++) {
             header.push_back(tmp_header[hexdigit-i]);
         }
